@@ -1,19 +1,35 @@
-h1 Sök efter en todo
+h1 Skapa en todo
 
-form action="/todos" method="get"
-    input name="q" placeholder="Sök på todo" type="text"
-    input type="submit" value="Sök!"
-br
-hr
+form action="/todos" method="post"
+  input type="text" name="new_todo" placeholder="Todo namn"
+  input type="text" name="description" placeholder="Beskrivning"
+  button type="submit" Lägg till
 
+h1 Ej färdiga Todos
+ul
+  - @datatodo.each do |todo|
+    - if !todo["done"] || todo["done"] == 0
+      li
+        - if params[:edit_id].to_i == todo["id"]
+          form action="/todos/#{todo["id"]}/update" method="post"
+            input type="text" name="name" value=todo["name"]
+            input type="text" name="description" value=todo["description"]
+            button type="submit" Spara
+        - else
+          | #{todo["name"]} - #{todo["description"]}
+          form action="/todos/#{todo["id"]}/done" method="post" style="display:inline"
+            button type="submit" Markera som färdig
+          form action="/todos/#{todo["id"]}/delete" method="post" style="display:inline"
+            button type="submit" Ta bort🔥
+          form action="/todos" method="get" style="display:inline"
+              input type="hidden" name="edit_id" value=todo["id"]
+              button type="submit" Ändra
 
-h1 Todo-lista
-
-- @datatodo.each do |todo|
-    h2 
-        a href="/todos/#{todo["id"]}/edit" #{todo["name"]}
-    p #{todo["description"]}
-
-    form action="/todos/#{todo["id"]}/delete" method="post"
-        input type="submit" value="Delete🔥"
-    hr
+h1 Färdiga Todos
+ul
+  - @datatodo.each do |todo|
+    - if todo["done"] == 1
+      li
+        | #{todo["name"]} - #{todo["description"]}
+        form action="/todos/#{todo["id"]}/delete" method="post" style="display:inline"
+          button type="submit" Ta bort🔥

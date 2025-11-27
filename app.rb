@@ -3,6 +3,13 @@ require 'sqlite3'
 require 'slim'
 require 'sinatra/reloader'
 
+post('/todos/:id/done') do
+    id = params[:id].to_i
+    db = SQLite3::Database.new("db/todos.db")
+    db.execute("UPDATE todos SET done = 1 WHERE id = ?", id)
+    redirect('/todos')
+    end
+
 post ('/todos/:id/delete') do
     #hämta todos
         id = params[:id].to_i
@@ -23,22 +30,12 @@ post ('/todos/:id/update') do
         #slutligen, redirect till todos
         redirect('/todos')
     end
-    
-get ('/todos/:id/edit') do
-        #koppla till databasen
-        db = SQLite3::Database.new("db/todos.db")
-        db.results_as_hash = true
-        id = params[:id].to_i
-        #@ innebär instansvariabel
-        @special_todo = db.execute("SELECT * FROM todos WHERE id = ?", id).first
-        #visa formulär för att uppdatera
-        slim(:"todos/edit")
-    end
 
 get ('/todos') do
         query = params[:q]
     #gör en koppling till databasen
     db = SQLite3::Database.new("db/todos.db")
+    edit_id = params[:edit_id]
     
     #[{}, {}, {}] vill vi ha, inte [[], []]
     db.results_as_hash = true
@@ -56,10 +53,6 @@ get ('/todos') do
     
     #visa upp med slim
     slim(:"todos/index")
-    end
-    
-get ('/todos/new') do
-    slim(:"todos/new")
     end
     
 post ('/todos') do
