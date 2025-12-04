@@ -1,35 +1,45 @@
 h1 Skapa en todo
 
 form action="/todos" method="post"
-  input type="text" name="new_todo" placeholder="Todo namn"
+  input type="text" name="new_todo" placeholder="Ny todo"
   input type="text" name="description" placeholder="Beskrivning"
-  button type="submit" Lägg till
+  select name="category"
+    option value="privat" Privat
+    option value="arbete" Arbete
+    option value="shopping" Shopping
+  button type="submit" Lägg till🔒
 
 h1 Ej färdiga Todos
 ul
   - @datatodo.each do |todo|
-    - if !todo["done"] || todo["done"] == 0
+    - if !todo["state"] || todo["state"] == 0
       li
         - if params[:edit_id].to_i == todo["id"]
           form action="/todos/#{todo["id"]}/update" method="post"
             input type="text" name="name" value=todo["name"]
             input type="text" name="description" value=todo["description"]
-            button type="submit" Spara
+            button type="submit" Spara💾
         - else
           | #{todo["name"]} - #{todo["description"]}
+          - if todo["category"]
+            |  (#{todo["category"]})
           form action="/todos/#{todo["id"]}/done" method="post" style="display:inline"
-            button type="submit" Markera som färdig
+            button type="submit" Markera som färdig😁
           form action="/todos/#{todo["id"]}/delete" method="post" style="display:inline"
             button type="submit" Ta bort🔥
           form action="/todos" method="get" style="display:inline"
               input type="hidden" name="edit_id" value=todo["id"]
-              button type="submit" Ändra
+              button type="submit" Ändra🔎
 
 h1 Färdiga Todos
 ul
   - @datatodo.each do |todo|
-    - if todo["done"] == 1
+    - if todo["state"] == 1
       li
         | #{todo["name"]} - #{todo["description"]}
+        - if todo["category"]
+          |  (#{todo["category"]})
+        form action="/todos/#{todo["id"]}/undone" method="post" style="display:inline"
+          button type="submit" Markera som ogjord💳
         form action="/todos/#{todo["id"]}/delete" method="post" style="display:inline"
           button type="submit" Ta bort🔥

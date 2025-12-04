@@ -6,7 +6,14 @@ require 'sinatra/reloader'
 post('/todos/:id/done') do
     id = params[:id].to_i
     db = SQLite3::Database.new("db/todos.db")
-    db.execute("UPDATE todos SET done = 1 WHERE id = ?", id)
+    db.execute("UPDATE todos SET state = 1 WHERE id = ?", id)
+    redirect('/todos')
+    end
+
+post('/todos/:id/undone') do
+    id = params[:id].to_i
+    db = SQLite3::Database.new("db/todos.db")
+    db.execute("UPDATE todos SET state = 0 WHERE id = ?", id)
     redirect('/todos')
     end
 
@@ -58,7 +65,8 @@ get ('/todos') do
 post ('/todos') do
         new_todo = params[:new_todo]
         description = params[:description]
+        category = params[:category] || "privat"
         db = SQLite3::Database.new("db/todos.db")
-        db.execute("INSERT INTO todos (name, description) VALUES (?,?)",[new_todo,description])
+        db.execute("INSERT INTO todos (name, description, category) VALUES (?,?,?)",[new_todo,description,category])
         redirect('/todos') # Hoppa till routen som visar upp alla todos
     end

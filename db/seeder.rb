@@ -1,6 +1,6 @@
 require 'sqlite3'
 
-db = SQLite3::Database.new("todos.db")
+db = SQLite3::Database.new("#{__dir__}/todos.db")
 
 
 def seed!(db)
@@ -23,13 +23,14 @@ def create_tables(db)
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               name TEXT NOT NULL, 
               description TEXT,
-              state BOOLEAN)')
+              state BOOLEAN,
+              category TEXT DEFAULT "privat")')
 end
 
 def populate_tables(db)
-  db.execute('INSERT INTO todos (name, description, state) VALUES ("Köp mjölk", "3 liter mellanmjölk, eko", false)')
-  db.execute('INSERT INTO todos (name, description, state) VALUES ("Köp julgran", "En rödgran", false)')
-  db.execute('INSERT INTO todos (name, description, state) VALUES ("Pynta gran", "Glöm inte lamporna i granen och tomten", false)')
+  db.execute('INSERT INTO todos (name, description, state, category) VALUES ("Köp mjölk", "3 liter mellanmjölk, eko", false, "shopping")')
+  db.execute('INSERT INTO todos (name, description, state, category) VALUES ("Köp julgran", "En rödgran", false, "shopping")')
+  db.execute('INSERT INTO todos (name, description, state, category) VALUES ("Pynta gran", "Glöm inte lamporna i granen och tomten", false, "privat")')
 end
 
 seed!(db)
