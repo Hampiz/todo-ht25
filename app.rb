@@ -2,6 +2,48 @@ require 'sinatra'
 require 'sqlite3'
 require 'slim'
 require 'sinatra/reloader'
+require 'bcrypt'
+
+post('/user') do
+    user = params[:user]
+    password = params[:password]
+    password_confirm = params[:password_confirm]
+
+    db = SQLite3::Database.new("db/store.db")
+    result = db.execute("SELECT id FROM users WHERE user =?", user)
+    if result.empty?
+        if password == password_confirm
+            password_digest = BCrypt::Password.create(password)
+            db.execute("INSERT INTO users (user, password_digest) VALUES (?, ?)", [user, password_digest])
+            redirect('/welcome')
+        else
+            redirect('/error') #Lösenord matchar inte
+        end
+    else
+        redirect('/login')
+    end
+end
+
+enable :session
+post('/login') do
+    user = params[:user]
+    password = params[:password]
+
+    db = SQLite3::Database.new("db/store.db")
+    db.results_as_hash = true
+    result = db.execute("SELECT id, password_digest FROM users WHERE user =?", user)
+    if !result.empty?
+        redirect('/error') #Fel lösenord/username
+    end
+    user_id = result.first("id")
+    password_digest = result.first("password_digest")
+    if BCrypt::Password.new(password_digest) == password
+        session[:user_id] = user_id
+        redirect('/welcome')
+    else
+        redirect('/error') #Fel lösenord/username
+    end
+end
 
 post('/todos/:id/done') do
     id = params[:id].to_i

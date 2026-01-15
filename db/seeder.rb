@@ -25,6 +25,10 @@ def create_tables(db)
               description TEXT,
               state BOOLEAN,
               category TEXT DEFAULT "privat")')
+db.execute('CREATE TABLE user (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL, 
+              password_digest TEXT NOT NULL)')
 end
 
 def populate_tables(db)
